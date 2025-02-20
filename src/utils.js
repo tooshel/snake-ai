@@ -202,7 +202,7 @@ export function getInput() {
     DPAD_DOWN: keys["ArrowDown"] || getDefaultBtn(),
     DPAD_LEFT: keys["ArrowLeft"] || getDefaultBtn(),
     DPAD_RIGHT: keys["ArrowRight"] || getDefaultBtn(),
-    BUTTON_SOUTH: keys["z"] || getDefaultBtn(),
+    BUTTON_SOUTH: keys["z"] || keys["Z"] || getDefaultBtn(),
     BUTTON_EAST: keys["x"] || getDefaultBtn(),
     BUTTON_WEST: keys["a"] || getDefaultBtn(),
     BUTTON_NORTH: keys["s"] || getDefaultBtn(),

@@ -119,10 +119,17 @@ function handleInput() {
   }
 
   // Restart game with Z key or left trigger
-  if (gameState === GAME_STATES.GAME_OVER && (p1.BUTTON_SOUTH.pressed || p1.LEFT_TRIGGER.pressed)) {
-    gameState = GAME_STATES.PLAYING;
-    snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), '#00ff00');
-    spawnFood();
+  if (gameState === GAME_STATES.GAME_OVER) {
+    console.log('Game Over State - Input Check:', {
+      buttonSouth: p1.BUTTON_SOUTH.pressed,
+      leftTrigger: p1.LEFT_TRIGGER.pressed
+    });
+    if (p1.BUTTON_SOUTH.pressed || p1.LEFT_TRIGGER.pressed) {
+      console.log('Restarting game...');
+      gameState = GAME_STATES.PLAYING;
+      snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), '#00ff00');
+      spawnFood();
+    }
   }
 }
 
