@@ -192,7 +192,7 @@ function draw() {
     ctx.textAlign = 'center';
     ctx.fillText('GAME OVER', width / 2, height / 2);
     ctx.font = '24px Arial';
-    ctx.fillText('Press Z or Left Trigger to restart', width / 2, height / 2 + 40);
+    ctx.fillText('Press T or Left Trigger to restart', width / 2, height / 2 + 40);
   }
 }
 
