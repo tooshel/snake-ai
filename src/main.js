@@ -10,8 +10,8 @@ const ROWS = Math.floor(height / GRID_SIZE);
 
 // Game states
 const GAME_STATES = {
-  PLAYING: 'playing',
-  GAME_OVER: 'gameOver'
+  PLAYING: "playing",
+  GAME_OVER: "gameOver",
 };
 
 // Direction constants
@@ -19,7 +19,7 @@ const DIRECTIONS = {
   UP: { x: 0, y: -1 },
   DOWN: { x: 0, y: 1 },
   LEFT: { x: -1, y: 0 },
-  RIGHT: { x: 1, y: 0 }
+  RIGHT: { x: 1, y: 0 },
 };
 
 // Snake player class
@@ -30,7 +30,7 @@ class Snake {
       { x: startX, y: startY },
       { x: startX - 1, y: startY },
       { x: startX - 2, y: startY },
-      { x: startX - 3, y: startY }
+      { x: startX - 3, y: startY },
     ];
     this.direction = DIRECTIONS.RIGHT;
     this.color = color;
@@ -41,7 +41,7 @@ class Snake {
     const head = this.body[0];
     const newHead = {
       x: head.x + this.direction.x,
-      y: head.y + this.direction.y
+      y: head.y + this.direction.y,
     };
 
     this.body.unshift(newHead);
@@ -58,7 +58,7 @@ class Snake {
 
   checkCollision() {
     const head = this.body[0];
-    
+
     // Wrap around walls instead of collision
     if (head.x < 0) head.x = COLS - 1;
     if (head.x >= COLS) head.x = 0;
@@ -78,7 +78,7 @@ class Snake {
 
 // Game state
 let gameState = GAME_STATES.PLAYING;
-let snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), '#00ff00');
+let snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), "#00ff00");
 let food = null;
 let lastTime = performance.now();
 let accumulator = 0;
@@ -88,7 +88,7 @@ function spawnFood() {
   while (true) {
     const x = Math.floor(Math.random() * COLS);
     const y = Math.floor(Math.random() * ROWS);
-    
+
     // Check if food spawns on snake
     let onSnake = false;
     for (const segment of snake.body) {
@@ -97,7 +97,7 @@ function spawnFood() {
         break;
       }
     }
-    
+
     if (!onSnake) {
       food = { x, y };
       break;
@@ -107,7 +107,9 @@ function spawnFood() {
 
 function handleInput() {
   const [p1] = getInput();
-  
+
+  console.log("handleInput", p1.GUIDE);
+
   if (p1.DPAD_LEFT.pressed && snake.direction !== DIRECTIONS.RIGHT) {
     snake.direction = DIRECTIONS.LEFT;
   } else if (p1.DPAD_RIGHT.pressed && snake.direction !== DIRECTIONS.LEFT) {
@@ -120,14 +122,14 @@ function handleInput() {
 
   // Restart game with Z key or left trigger
   if (gameState === GAME_STATES.GAME_OVER) {
-    console.log('Game Over State - Input Check:', {
+    console.log("Game Over State - Input Check:", {
       buttonSouth: p1.BUTTON_SOUTH.pressed,
-      leftTrigger: p1.LEFT_TRIGGER.pressed
+      leftTrigger: p1.LEFT_TRIGGER.pressed,
     });
-    if (p1.BUTTON_SOUTH.pressed || p1.LEFT_TRIGGER.pressed) {
-      console.log('Restarting game...');
+    if (p1.GUIDE.pressed) {
+      console.log("Restarting game...");
       gameState = GAME_STATES.PLAYING;
-      snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), '#00ff00');
+      snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), "#00ff00");
       spawnFood();
     }
   }
@@ -137,34 +139,34 @@ function update(deltaTime) {
   if (gameState !== GAME_STATES.PLAYING) return;
 
   handleInput();
-  
+
   accumulator += deltaTime;
-  
+
   while (accumulator >= STEP_TIME) {
     snake.move();
-    
+
     // Check collisions
     if (snake.checkCollision()) {
       gameState = GAME_STATES.GAME_OVER;
       return;
     }
-    
+
     // Check food collision
     const head = snake.body[0];
     if (head.x === food.x && head.y === food.y) {
       snake.grow();
       spawnFood();
     }
-    
+
     accumulator -= STEP_TIME;
   }
 }
 
 function draw() {
   // Clear canvas
-  ctx.fillStyle = '#000000';
+  ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, width, height);
-  
+
   // Draw snake
   ctx.fillStyle = snake.color;
   for (const segment of snake.body) {
@@ -175,24 +177,24 @@ function draw() {
       GRID_SIZE - 1
     );
   }
-  
+
   // Draw food
-  ctx.fillStyle = '#ff0000';
+  ctx.fillStyle = "#ff0000";
   ctx.fillRect(
     food.x * GRID_SIZE,
     food.y * GRID_SIZE,
     GRID_SIZE - 1,
     GRID_SIZE - 1
   );
-  
+
   // Draw game over
   if (gameState === GAME_STATES.GAME_OVER) {
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '48px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('GAME OVER', width / 2, height / 2);
-    ctx.font = '24px Arial';
-    ctx.fillText('Press T or Left Trigger to restart', width / 2, height / 2 + 40);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "48px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("GAME OVER", width / 2, height / 2);
+    ctx.font = "24px Arial";
+    ctx.fillText("Press Start or Enter to restart", width / 2, height / 2 + 40);
   }
 }
 
