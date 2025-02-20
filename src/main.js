@@ -82,7 +82,12 @@ let snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), "#00ff00");
 let food = null;
 let lastTime = performance.now();
 let accumulator = 0;
-const STEP_TIME = 150; // Snake moves every 150ms
+const INITIAL_STEP_TIME = 150; // Initial snake movement speed (ms)
+const SPEED_INCREASE_INTERVAL = 5; // Increase speed every X segments
+const SPEED_INCREASE_AMOUNT = 10; // How many ms faster to make the snake
+const MIN_STEP_TIME = 50; // Fastest allowed speed
+let currentStepTime = INITIAL_STEP_TIME;
+let score = 0;
 
 function spawnFood() {
   while (true) {
@@ -126,6 +131,8 @@ function update(deltaTime) {
     console.log("Restarting game...");
     gameState = GAME_STATES.PLAYING;
     snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), "#00ff00");
+    score = 0;
+    currentStepTime = INITIAL_STEP_TIME;
     spawnFood();
     return;
   }
@@ -148,6 +155,13 @@ function update(deltaTime) {
     const head = snake.body[0];
     if (head.x === food.x && head.y === food.y) {
       snake.grow();
+      score++;
+      
+      // Increase speed every SPEED_INCREASE_INTERVAL points
+      if (score % SPEED_INCREASE_INTERVAL === 0) {
+        currentStepTime = Math.max(MIN_STEP_TIME, currentStepTime - SPEED_INCREASE_AMOUNT);
+      }
+      
       spawnFood();
     }
 
@@ -179,6 +193,12 @@ function draw() {
     GRID_SIZE - 1,
     GRID_SIZE - 1
   );
+
+  // Draw score
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "24px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText(`Score: ${score}`, 10, 30);
 
   // Draw game over
   if (gameState === GAME_STATES.GAME_OVER) {
