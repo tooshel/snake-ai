@@ -3,7 +3,7 @@ import { getInput, createResourceLoader } from "./utils.js";
 // Set up font loading
 const gameFont = new FontFace(
   'PressStart2P',
-  'url("/public/fonts/PressStart2P-Regular.ttf")'
+  'url("../public/fonts/PressStart2P-Regular.ttf")'
 );
 
 // Load the font
@@ -207,12 +207,15 @@ function draw() {
   // Draw score and level
   ctx.fillStyle = "#ffffff";
   ctx.font = "16px PressStart2P";
+  
+  // Draw score on left
   ctx.textAlign = "left";
   ctx.fillText(`Score: ${score}`, 10, 30);
   
-  // Calculate level based on speed difference from initial
+  // Calculate and draw level on right
   const level = Math.floor((INITIAL_STEP_TIME - currentStepTime) / SPEED_INCREASE_AMOUNT) + 1;
-  ctx.fillText(`Level: ${level}`, 10, 60);
+  ctx.textAlign = "right";
+  ctx.fillText(`Level: ${level}`, width - 10, 30);
 
   // Draw game over
   if (gameState === GAME_STATES.GAME_OVER) {
