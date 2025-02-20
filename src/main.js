@@ -108,8 +108,6 @@ function spawnFood() {
 function handleInput() {
   const [p1] = getInput();
 
-  console.log("handleInput", p1.GUIDE);
-
   if (p1.DPAD_LEFT.pressed && snake.direction !== DIRECTIONS.RIGHT) {
     snake.direction = DIRECTIONS.LEFT;
   } else if (p1.DPAD_RIGHT.pressed && snake.direction !== DIRECTIONS.LEFT) {
@@ -119,23 +117,18 @@ function handleInput() {
   } else if (p1.DPAD_DOWN.pressed && snake.direction !== DIRECTIONS.UP) {
     snake.direction = DIRECTIONS.DOWN;
   }
-
-  // Restart game with Z key or left trigger
-  if (gameState === GAME_STATES.GAME_OVER) {
-    console.log("Game Over State - Input Check:", {
-      buttonSouth: p1.BUTTON_SOUTH.pressed,
-      leftTrigger: p1.LEFT_TRIGGER.pressed,
-    });
-    if (p1.GUIDE.pressed) {
-      console.log("Restarting game...");
-      gameState = GAME_STATES.PLAYING;
-      snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), "#00ff00");
-      spawnFood();
-    }
-  }
 }
 
 function update(deltaTime) {
+  // Check for game restart
+  const [p1] = getInput();
+  if (gameState === GAME_STATES.GAME_OVER && p1.GUIDE.pressed) {
+    console.log("Restarting game...");
+    gameState = GAME_STATES.PLAYING;
+    snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), "#00ff00");
+    spawnFood();
+    return;
+  }
   if (gameState !== GAME_STATES.PLAYING) return;
 
   handleInput();
