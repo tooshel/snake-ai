@@ -1,4 +1,14 @@
-import { getInput } from "./utils.js";
+import { getInput, createResourceLoader } from "./utils.js";
+
+// Set up font loading
+const gameFont = new FontFace(
+  'PressStart2P',
+  'url("/public/fonts/PressStart2P-Regular.ttf")'
+);
+
+// Load the font
+await gameFont.load();
+document.fonts.add(gameFont);
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -194,19 +204,23 @@ function draw() {
     GRID_SIZE - 1
   );
 
-  // Draw score
+  // Draw score and level
   ctx.fillStyle = "#ffffff";
-  ctx.font = "24px Arial";
+  ctx.font = "16px PressStart2P";
   ctx.textAlign = "left";
   ctx.fillText(`Score: ${score}`, 10, 30);
+  
+  // Calculate level based on speed difference from initial
+  const level = Math.floor((INITIAL_STEP_TIME - currentStepTime) / SPEED_INCREASE_AMOUNT) + 1;
+  ctx.fillText(`Level: ${level}`, 10, 60);
 
   // Draw game over
   if (gameState === GAME_STATES.GAME_OVER) {
     ctx.fillStyle = "#ffffff";
-    ctx.font = "48px Arial";
+    ctx.font = "32px PressStart2P";
     ctx.textAlign = "center";
     ctx.fillText("GAME OVER", width / 2, height / 2);
-    ctx.font = "24px Arial";
+    ctx.font = "16px PressStart2P";
     ctx.fillText("Press Start or Enter to restart", width / 2, height / 2 + 40);
   }
 }
