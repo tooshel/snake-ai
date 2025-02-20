@@ -25,7 +25,13 @@ const DIRECTIONS = {
 // Snake player class
 class Snake {
   constructor(startX, startY, color) {
-    this.body = [{ x: startX, y: startY }];
+    // Start with 4 segments
+    this.body = [
+      { x: startX, y: startY },
+      { x: startX - 1, y: startY },
+      { x: startX - 2, y: startY },
+      { x: startX - 3, y: startY }
+    ];
     this.direction = DIRECTIONS.RIGHT;
     this.color = color;
     this.growFlag = false;
@@ -53,10 +59,11 @@ class Snake {
   checkCollision() {
     const head = this.body[0];
     
-    // Wall collision
-    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
-      return true;
-    }
+    // Wrap around walls instead of collision
+    if (head.x < 0) head.x = COLS - 1;
+    if (head.x >= COLS) head.x = 0;
+    if (head.y < 0) head.y = ROWS - 1;
+    if (head.y >= ROWS) head.y = 0;
 
     // Self collision
     for (let i = 1; i < this.body.length; i++) {
@@ -111,8 +118,8 @@ function handleInput() {
     snake.direction = DIRECTIONS.DOWN;
   }
 
-  // Restart game
-  if (gameState === GAME_STATES.GAME_OVER && p1.BUTTON_SOUTH.pressed) {
+  // Restart game with Z key or left trigger
+  if (gameState === GAME_STATES.GAME_OVER && (p1.BUTTON_SOUTH.pressed || p1.LEFT_TRIGGER.pressed)) {
     gameState = GAME_STATES.PLAYING;
     snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), '#00ff00');
     spawnFood();
@@ -178,7 +185,7 @@ function draw() {
     ctx.textAlign = 'center';
     ctx.fillText('GAME OVER', width / 2, height / 2);
     ctx.font = '24px Arial';
-    ctx.fillText('Press Z to restart', width / 2, height / 2 + 40);
+    ctx.fillText('Press Z or Left Trigger to restart', width / 2, height / 2 + 40);
   }
 }
 
