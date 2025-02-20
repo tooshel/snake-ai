@@ -1,71 +1,197 @@
-import {
-  loadSound,
-  loadImage,
-  playSound,
-  getInput,
-  createResourceLoader,
-} from "./utils.js";
+import { getInput } from "./utils.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-const resources = createResourceLoader();
 
+const GRID_SIZE = 20; // Size of each grid cell
 const { width, height } = canvas;
-let lastTime;
-let laserSound;
-let playerImg;
+const COLS = Math.floor(width / GRID_SIZE);
+const ROWS = Math.floor(height / GRID_SIZE);
 
-const player = {
-  x: width / 2, // center of the screen
-  y: height / 2, // center of the screen
-  width: width * 0.1, // 10% of the screen width
-  height: width * 0.1, // 10% of the screen width
-  canPlaySound: true, // have to release the button to play again
-  speed: width * 0.0005, // 0.05% of the screen width per millisecond
+// Game states
+const GAME_STATES = {
+  PLAYING: 'playing',
+  GAME_OVER: 'gameOver'
 };
 
-function update(elapsedTime) {
+// Direction constants
+const DIRECTIONS = {
+  UP: { x: 0, y: -1 },
+  DOWN: { x: 0, y: 1 },
+  LEFT: { x: -1, y: 0 },
+  RIGHT: { x: 1, y: 0 }
+};
+
+// Snake player class
+class Snake {
+  constructor(startX, startY, color) {
+    this.body = [{ x: startX, y: startY }];
+    this.direction = DIRECTIONS.RIGHT;
+    this.color = color;
+    this.growFlag = false;
+  }
+
+  move() {
+    const head = this.body[0];
+    const newHead = {
+      x: head.x + this.direction.x,
+      y: head.y + this.direction.y
+    };
+
+    this.body.unshift(newHead);
+    if (!this.growFlag) {
+      this.body.pop();
+    } else {
+      this.growFlag = false;
+    }
+  }
+
+  grow() {
+    this.growFlag = true;
+  }
+
+  checkCollision() {
+    const head = this.body[0];
+    
+    // Wall collision
+    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
+      return true;
+    }
+
+    // Self collision
+    for (let i = 1; i < this.body.length; i++) {
+      if (head.x === this.body[i].x && head.y === this.body[i].y) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+}
+
+// Game state
+let gameState = GAME_STATES.PLAYING;
+let snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), '#00ff00');
+let food = null;
+let lastTime = performance.now();
+let accumulator = 0;
+const STEP_TIME = 150; // Snake moves every 150ms
+
+function spawnFood() {
+  while (true) {
+    const x = Math.floor(Math.random() * COLS);
+    const y = Math.floor(Math.random() * ROWS);
+    
+    // Check if food spawns on snake
+    let onSnake = false;
+    for (const segment of snake.body) {
+      if (segment.x === x && segment.y === y) {
+        onSnake = true;
+        break;
+      }
+    }
+    
+    if (!onSnake) {
+      food = { x, y };
+      break;
+    }
+  }
+}
+
+function handleInput() {
   const [p1] = getInput();
-  if (p1.BUTTON_SOUTH.pressed && player.canPlaySound) {
-    playSound(laserSound);
-    player.canPlaySound = false;
-  } else if (!p1.BUTTON_SOUTH.pressed) {
-    player.canPlaySound = true;
+  
+  if (p1.DPAD_LEFT.pressed && snake.direction !== DIRECTIONS.RIGHT) {
+    snake.direction = DIRECTIONS.LEFT;
+  } else if (p1.DPAD_RIGHT.pressed && snake.direction !== DIRECTIONS.LEFT) {
+    snake.direction = DIRECTIONS.RIGHT;
+  } else if (p1.DPAD_UP.pressed && snake.direction !== DIRECTIONS.DOWN) {
+    snake.direction = DIRECTIONS.UP;
+  } else if (p1.DPAD_DOWN.pressed && snake.direction !== DIRECTIONS.UP) {
+    snake.direction = DIRECTIONS.DOWN;
   }
 
-  if (p1.DPAD_LEFT.pressed) {
-    player.x -= player.speed * elapsedTime;
-  } else if (p1.DPAD_RIGHT.pressed) {
-    player.x += player.speed * elapsedTime;
+  // Restart game
+  if (gameState === GAME_STATES.GAME_OVER && p1.BUTTON_SOUTH.pressed) {
+    gameState = GAME_STATES.PLAYING;
+    snake = new Snake(Math.floor(COLS / 4), Math.floor(ROWS / 2), '#00ff00');
+    spawnFood();
   }
+}
 
-  if (p1.DPAD_UP.pressed) {
-    player.y -= player.speed * elapsedTime;
-  } else if (p1.DPAD_DOWN.pressed) {
-    player.y += player.speed * elapsedTime;
+function update(deltaTime) {
+  if (gameState !== GAME_STATES.PLAYING) return;
+
+  handleInput();
+  
+  accumulator += deltaTime;
+  
+  while (accumulator >= STEP_TIME) {
+    snake.move();
+    
+    // Check collisions
+    if (snake.checkCollision()) {
+      gameState = GAME_STATES.GAME_OVER;
+      return;
+    }
+    
+    // Check food collision
+    const head = snake.body[0];
+    if (head.x === food.x && head.y === food.y) {
+      snake.grow();
+      spawnFood();
+    }
+    
+    accumulator -= STEP_TIME;
   }
 }
 
 function draw() {
-  ctx.fillStyle = "blue";
+  // Clear canvas
+  ctx.fillStyle = '#000000';
   ctx.fillRect(0, 0, width, height);
-  ctx.drawImage(playerImg, player.x, player.y, player.width, player.width);
+  
+  // Draw snake
+  ctx.fillStyle = snake.color;
+  for (const segment of snake.body) {
+    ctx.fillRect(
+      segment.x * GRID_SIZE,
+      segment.y * GRID_SIZE,
+      GRID_SIZE - 1,
+      GRID_SIZE - 1
+    );
+  }
+  
+  // Draw food
+  ctx.fillStyle = '#ff0000';
+  ctx.fillRect(
+    food.x * GRID_SIZE,
+    food.y * GRID_SIZE,
+    GRID_SIZE - 1,
+    GRID_SIZE - 1
+  );
+  
+  // Draw game over
+  if (gameState === GAME_STATES.GAME_OVER) {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '48px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('GAME OVER', width / 2, height / 2);
+    ctx.font = '24px Arial';
+    ctx.fillText('Press Z to restart', width / 2, height / 2 + 40);
+  }
 }
 
 function gameLoop() {
-  const deltaTime = performance.now() - lastTime;
+  const currentTime = performance.now();
+  const deltaTime = currentTime - lastTime;
+  lastTime = currentTime;
+
   update(deltaTime);
   draw();
-  lastTime = performance.now();
   requestAnimationFrame(gameLoop);
 }
 
-async function launch() {
-  // wait for assets to load
-  laserSound = await loadSound("sounds/laser.mp3");
-  playerImg = await loadImage("images/js.png");
-  lastTime = performance.now();
-  gameLoop();
-}
-
-launch();
+// Start game
+spawnFood();
+gameLoop();
