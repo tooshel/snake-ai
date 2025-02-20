@@ -142,7 +142,7 @@ function update(deltaTime) {
 
   accumulator += deltaTime;
 
-  while (accumulator >= STEP_TIME) {
+  while (accumulator >= currentStepTime) {
     snake.move();
 
     // Check collisions
@@ -165,7 +165,7 @@ function update(deltaTime) {
       spawnFood();
     }
 
-    accumulator -= STEP_TIME;
+    accumulator -= currentStepTime;
   }
 }
 
