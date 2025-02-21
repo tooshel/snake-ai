@@ -1,7 +1,7 @@
 {
   "name": "snake-ai",
   "private": true,
-  "version": "0.00.0",
+  "version": "0.99.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
