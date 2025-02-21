@@ -1,0 +1,49 @@
+
+# 2025-02-20 15:42:21.814139
++yes
+
+# 2025-02-20 15:42:29.428571
++using sr
+
+# 2025-02-20 15:45:48.740505
++ using src/main.js and src/utils.js make a new "snake" game. If I remember right, a new "dot" appears and as a player you chase it to direct the snake to the dot without crossing yourself. Every dot you get you grow one dot longer. I eventually want to make this a two player game so keep that in mind. The second player could use on device controls or connect over a network. this is a canvas only game. only draw to the canvas like you see in the example. no css and no dom!
+
+# 2025-02-20 15:53:15.974557
++ I didn't ask for a grid but you gave me one! I love it. Can the snake start off longer? 4 tiles instead of 1? Also the game ends as soon as I get the red dot and it's only supposed to end if I cross myself. Also, the restart should be "z" or some other button on the controller like left trigger. Even now the Z doesn't work.
+
+# 2025-02-20 15:56:16.566566
++z still in not restarting the game
+
+# 2025-02-20 16:03:31.510723
++z is being overridden by the utils.js . . . just change it to use t to restart
+
+# 2025-02-20 16:40:47.096111
++/add sr
+
+# 2025-02-20 16:40:58.028504
++/add src/main.js
+
+# 2025-02-20 16:41:02.347488
++/add src/utils.js
+
+# 2025-02-20 16:41:52.705801
++I added   console.log("handleInput", p1.GUIDE); to the "handleInput" and when the game is over, that function is not being called. Which means that it will never know when you press "start" to reset the game.
+
+# 2025-02-20 16:45:47.814006
++okay, that's great. Now we need a score at the top of the screen. And we could also make the snake move a bit faster after every 5 segments added? make that a variable though. Same with the increase in speed . . . should be able to easily adjust that to tweak the game
+
+# 2025-02-20 16:46:36.654270
++nice try . . . but I get thie error fullGamefile path file:///Users/sheldon/Sites/snake-ai/src/main.js
++Uncaught Exception: ReferenceError: STEP_TIME is not defined
++    at update (file:///Users/sheldon/Sites/snake-ai/src/main.js:145:25)
++    at gameLoop (file:///Users/sheldon/Sites/snake-ai/src/main.js:219:3)
++    at file:///Users/sheldon/Sites/snake-ai/src/main.js:226:1
++    at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
++    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:547:26)
++    at async main (file:///Users/sheldon/.npm/_npx/d9a6dfcff948d8d9/node_modules/rungame/launcher.js:366:3) undefined
+
+# 2025-02-20 16:53:56.178284
++it's nice seeing the score up there, but what about the current speed? maybe call that "level" and also add it to the top. also, I want a nice gaming looking font. use the createResourceLoader function from utils in main and have it load a font. I put a font in public/fonts/PressStart2P-Regular.ttf. to use the font, you should be using a "FontFace" function. I can get you an example if you get confused. 
+
+# 2025-02-20 16:54:49.353686
++I see the level there but can we move it over to the right? also, the font isn't working, do you need help?
