@@ -2,8 +2,8 @@ import { getInput, createResourceLoader } from "./utils.js";
 
 // Set up font loading
 const gameFont = new FontFace(
-  'PressStart2P',
-  'url("../public/fonts/PressStart2P-Regular.ttf")'
+  "PressStart2P",
+  "url(/fonts/PressStart2P-Regular.ttf)"
 );
 
 // Load the font
@@ -166,12 +166,15 @@ function update(deltaTime) {
     if (head.x === food.x && head.y === food.y) {
       snake.grow();
       score++;
-      
+
       // Increase speed every SPEED_INCREASE_INTERVAL points
       if (score % SPEED_INCREASE_INTERVAL === 0) {
-        currentStepTime = Math.max(MIN_STEP_TIME, currentStepTime - SPEED_INCREASE_AMOUNT);
+        currentStepTime = Math.max(
+          MIN_STEP_TIME,
+          currentStepTime - SPEED_INCREASE_AMOUNT
+        );
       }
-      
+
       spawnFood();
     }
 
@@ -207,13 +210,15 @@ function draw() {
   // Draw score and level
   ctx.fillStyle = "#ffffff";
   ctx.font = "16px PressStart2P";
-  
+
   // Draw score on left
   ctx.textAlign = "left";
   ctx.fillText(`Score: ${score}`, 10, 30);
-  
+
   // Calculate and draw level on right
-  const level = Math.floor((INITIAL_STEP_TIME - currentStepTime) / SPEED_INCREASE_AMOUNT) + 1;
+  const level =
+    Math.floor((INITIAL_STEP_TIME - currentStepTime) / SPEED_INCREASE_AMOUNT) +
+    1;
   ctx.textAlign = "right";
   ctx.fillText(`Level: ${level}`, width - 10, 30);
 
